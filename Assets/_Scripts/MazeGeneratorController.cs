@@ -54,7 +54,7 @@ public class MazeGeneratorController : MonoBehaviour
                 }
                 else
                 {
-                    int coinResult = coinFlip();
+                    int coinResult = CoinFlip();
                     if (coinResult == 1)
                     {
                         //carve north
@@ -87,96 +87,73 @@ public class MazeGeneratorController : MonoBehaviour
             {
                 string doorBinary = generatedMaze[y, x].doorUp.ToString() + generatedMaze[y, x].doorRight.ToString() +
                                     generatedMaze[y, x].doorDown.ToString() + generatedMaze[y, x].doorLeft.ToString();
-
-                Vector3 location = new Vector3(xCoord, 0, zCoord);
-                GameObject mazePiece;
-                //translated in steps of 6
+                GameObject mazePart = null;
+                Quaternion rotation = Quaternion.identity;
+                
                 switch (doorBinary)
                 {
                     case "0000":
-                        mazePiece = Instantiate(mazeParts[0], location, Quaternion.identity) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                    mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[0];
                         break;
                     case "0001":
-                        mazePiece = Instantiate(mazeParts[1], location, Quaternion.Euler(new Vector3(0, -90, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[1];
+                        rotation = Quaternion.Euler(new Vector3(0, -90, 0));
                         break;
                     case "0010":
-                        mazePiece = Instantiate(mazeParts[1], location, Quaternion.Euler(new Vector3(0, 180, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[1];
+                        rotation = Quaternion.Euler(new Vector3(0, 180, 0));
                         break;
                     case "0011":
-                        mazePiece = Instantiate(mazeParts[2], location, Quaternion.Euler(new Vector3(0, 180, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[2];
+                        rotation = Quaternion.Euler(new Vector3(0, 180, 0));
                         break;
                     case "0100":
-                        mazePiece = Instantiate(mazeParts[1], location, Quaternion.Euler(new Vector3(0, 90, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[1];
+                        rotation = Quaternion.Euler(new Vector3(0, 90, 0));
                         break;
                     case "0101":
-                        mazePiece = Instantiate(mazeParts[3], location, Quaternion.Euler(new Vector3(0, 90, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[3];
+                        rotation = Quaternion.Euler(new Vector3(0, 90, 0));
                         break;
                     case "0110":
-                        mazePiece = Instantiate(mazeParts[2], location, Quaternion.Euler(new Vector3(0, 90, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[2];
+                        rotation = Quaternion.Euler(new Vector3(0, 90, 0));
                         break;
                     case "0111":
-                        mazePiece = Instantiate(mazeParts[4], location, Quaternion.Euler(new Vector3(0, 180, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[4];
+                        rotation = Quaternion.Euler(new Vector3(0, 180, 0));
                         break;
                     case "1000":
-                        mazePiece = Instantiate(mazeParts[1], location, Quaternion.identity) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[1];
                         break;
                     case "1001":
-                        mazePiece = Instantiate(mazeParts[2], location, Quaternion.Euler(new Vector3(0, -90, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[2];
+                        rotation = Quaternion.Euler(new Vector3(0, -90, 0));
                         break;
                     case "1010":
-                        mazePiece = Instantiate(mazeParts[3], location, Quaternion.identity) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[3];
                         break;
                     case "1011":
-                        mazePiece = Instantiate(mazeParts[4], location, Quaternion.Euler(new Vector3(0, -90, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[4];
+                        rotation = Quaternion.Euler(new Vector3(0, -90, 0));
                         break;
                     case "1100":
-                        mazePiece = Instantiate(mazeParts[2], location, Quaternion.identity) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[2];
                         break;
                     case "1101":
-                        mazePiece = Instantiate(mazeParts[4], location, Quaternion.Euler(new Vector3(0, 0, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[4];
                         break;
                     case "1110":
-                        mazePiece = Instantiate(mazeParts[4], location, Quaternion.Euler(new Vector3(0, 90, 0))) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[4];
+                        rotation = Quaternion.Euler(new Vector3(0, 90, 0));
                         break;
                     case "1111":
-                        mazePiece = Instantiate(mazeParts[5], location, Quaternion.identity) as GameObject;
-                        mazePiece.name = "[" + x + ", " + y + "]";
-                        mazePiece.transform.SetParent(transform);
+                        mazePart = mazeParts[5];
                         break;
                     default:
                         break;
                 }
-
+                PlaceMazePiece(xCoord, zCoord, x, y, mazePart, rotation);
                 xCoord += 6.0f;
             }
             zCoord += 6.0f;
@@ -184,9 +161,18 @@ public class MazeGeneratorController : MonoBehaviour
         }
     }
 
-    int coinFlip()
+    int CoinFlip()
     {
         return UnityEngine.Random.Range(0, 2);
+    }
+
+    void PlaceMazePiece(float xCoord, float zCoord, int x, int y, GameObject mazePart, Quaternion rotation)
+    {
+        Vector3 location = new Vector3(xCoord, 0, zCoord);
+        GameObject mazePiece;
+        mazePiece = Instantiate(mazePart, location, rotation) as GameObject;
+        mazePiece.name = "[" + x + ", " + y + "]";
+        mazePiece.transform.SetParent(transform);
     }
 }
 
