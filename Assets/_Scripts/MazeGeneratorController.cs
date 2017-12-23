@@ -12,39 +12,66 @@ public class MazeGeneratorController : MonoBehaviour
 	// Use this for initialization
 	void Start ()
     {
+        InitializeMaze();
         GenerateMaze();
         CreateMaze();
     }
 
-    void GenerateMaze()
+    void InitializeMaze()
     {
         generatedMaze = new MazeCell[mazeWidth, mazeHeight];
-        //starts at bottom left like the book does
-        for (int j = mazeHeight - 1; j >= 0; j--)
+        for (int i = 0; i < mazeWidth; i++)
         {
-            for (int i = 0; i < mazeWidth; i++)
+            for(int j = 0; j < mazeHeight; j++)
             {
                 generatedMaze[i, j] = new MazeCell();
-                int coinResult = coinFlip();
-                if(i == mazeWidth-1)
+            }
+        }
+    }
+
+    void GenerateMaze()
+    {
+        //starts at bottom left like the book does
+        for (int y = mazeHeight - 1; y >= 0; y--)
+        {
+            for (int x = 0; x < mazeWidth; x++)
+            {
+                if(x == mazeWidth - 1)
                 {
-                    generatedMaze[i, j].doorUp = 1;
+                    if(y > 0)
+                    {
+                        generatedMaze[y, x].doorUp = 1;
+                        generatedMaze[y - 1, x].doorDown = 1;
+                    }
                 }
-                else if(j == 0)
+                else if(y == 0)
                 {
-                    generatedMaze[i, j].doorRight = 1;
+                    generatedMaze[y, x].doorRight = 1;
+                    if(x < mazeWidth - 1)
+                    {
+                        generatedMaze[y, x + 1].doorLeft = 1;
+                    }
                 }
                 else
                 {
+                    int coinResult = coinFlip();
                     if (coinResult == 1)
                     {
                         //carve north
-                        generatedMaze[i, j].doorUp = 1;
+                        if (y > 0)
+                        {
+                            generatedMaze[y, x].doorUp = 1;
+                            generatedMaze[y - 1, x].doorDown = 1;
+                        }
                     }
                     else
                     {
                         //carve east
-                        generatedMaze[i, j].doorRight = 1;
+                        generatedMaze[y, x].doorRight = 1;
+                        if (x < mazeWidth - 1)
+                        {
+                            generatedMaze[y, x + 1].doorLeft = 1;
+                        }
                     }
                 }
             }
@@ -53,105 +80,107 @@ public class MazeGeneratorController : MonoBehaviour
 
     void CreateMaze()
     {
-        float x = 0.0f, z = 0.0f;
-        for(int i = 0; i < mazeWidth; i++)
+        float xCoord = 0.0f, zCoord = 0.0f;
+        for (int y = mazeHeight - 1; y >= 0; y--)
         {
-            for(int j = 0; j < mazeHeight; j++)
+            for (int x = 0; x < mazeWidth; x++)
             {
-                string doorBinary = generatedMaze[i, j].doorUp.ToString() + generatedMaze[i, j].doorRight.ToString();
-                
-                if (j == mazeHeight - 1)
-                {
-                    doorBinary = doorBinary + "0";
-                }
-                else
-                {
-                    doorBinary = doorBinary + generatedMaze[i, j + 1].doorUp.ToString();
-                }
+                string doorBinary = generatedMaze[y, x].doorUp.ToString() + generatedMaze[y, x].doorRight.ToString() +
+                                    generatedMaze[y, x].doorDown.ToString() + generatedMaze[y, x].doorLeft.ToString();
 
-                if (i < mazeWidth - 1)
-                {
-                    doorBinary = doorBinary + "0";
-                }
-                else
-                {
-                    doorBinary = doorBinary + generatedMaze[i - i, j].doorRight.ToString();
-                }
-
+                Vector3 location = new Vector3(xCoord, 0, zCoord);
+                GameObject mazePiece;
                 //translated in steps of 6
-                switch(doorBinary)
+                switch (doorBinary)
                 {
                     case "0000":
-                        Instantiate(mazeParts[0], new Vector3(x, 0, z), Quaternion.identity);
-                        Debug.Log("No Doors");
+                        mazePiece = Instantiate(mazeParts[0], location, Quaternion.identity) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                    mazePiece.transform.SetParent(transform);
                         break;
                     case "0001":
-                        Instantiate(mazeParts[1], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 270, 0)));
-                        Debug.Log("1 Door: Left");
+                        mazePiece = Instantiate(mazeParts[1], location, Quaternion.Euler(new Vector3(0, -90, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "0010":
-                        Instantiate(mazeParts[1], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 180, 0)));
-                        Debug.Log("1 Door: Down");
+                        mazePiece = Instantiate(mazeParts[1], location, Quaternion.Euler(new Vector3(0, 180, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "0011":
-                        Instantiate(mazeParts[2], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 270, 0)));
-                        Debug.Log("2 Doors: Down, Left");
+                        mazePiece = Instantiate(mazeParts[2], location, Quaternion.Euler(new Vector3(0, 180, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "0100":
-                        Instantiate(mazeParts[1], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 90, 0)));
-                        Debug.Log("1 Door: Right");
+                        mazePiece = Instantiate(mazeParts[1], location, Quaternion.Euler(new Vector3(0, 90, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "0101":
-                        Instantiate(mazeParts[3], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 90, 0)));
-                        Debug.Log("2 Doors: Right, Left");
+                        mazePiece = Instantiate(mazeParts[3], location, Quaternion.Euler(new Vector3(0, 90, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "0110":
-                        Instantiate(mazeParts[2], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 90, 0)));
-                        Debug.Log("2 Doors: Right, Down");
+                        mazePiece = Instantiate(mazeParts[2], location, Quaternion.Euler(new Vector3(0, 90, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "0111":
-                        Instantiate(mazeParts[4], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 180, 0)));
-                        Debug.Log("3 Doors: Right, Down, Left");
+                        mazePiece = Instantiate(mazeParts[4], location, Quaternion.Euler(new Vector3(0, 180, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "1000":
-                        Instantiate(mazeParts[1], new Vector3(x, 0, z), Quaternion.identity);
-                        Debug.Log("1 Door: Up");
+                        mazePiece = Instantiate(mazeParts[1], location, Quaternion.identity) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "1001":
-                        Instantiate(mazeParts[2], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 270, 0)));
-                        Debug.Log("2 Doors: Up, Left");
+                        mazePiece = Instantiate(mazeParts[2], location, Quaternion.Euler(new Vector3(0, -90, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "1010":
-                        Instantiate(mazeParts[3], new Vector3(x, 0, z), Quaternion.identity);
-                        Debug.Log("2 Doors: Up, Down");
+                        mazePiece = Instantiate(mazeParts[3], location, Quaternion.identity) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "1011":
-                        Instantiate(mazeParts[4], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 270, 0)));
-                        Debug.Log("3 Doors: Up, Down, Left");
+                        mazePiece = Instantiate(mazeParts[4], location, Quaternion.Euler(new Vector3(0, -90, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "1100":
-                        Instantiate(mazeParts[2], new Vector3(x, 0, z), Quaternion.identity);
-                        Debug.Log("2 Doors: Up, Right");
+                        mazePiece = Instantiate(mazeParts[2], location, Quaternion.identity) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "1101":
-                        Instantiate(mazeParts[4], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 0, 0)));
-                        Debug.Log("3 Doors: Up, Right, Left");
+                        mazePiece = Instantiate(mazeParts[4], location, Quaternion.Euler(new Vector3(0, 0, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "1110":
-                        Instantiate(mazeParts[4], new Vector3(x, 0, z), Quaternion.Euler(new Vector3(0, 90, 0)));
-                        Debug.Log("3 Doors: Up, Right, Down");
+                        mazePiece = Instantiate(mazeParts[4], location, Quaternion.Euler(new Vector3(0, 90, 0))) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     case "1111":
-                        Instantiate(mazeParts[5], new Vector3(x, 0, z), Quaternion.identity);
-                        Debug.Log("4 Doors: Up, Right, Down, Left");
+                        mazePiece = Instantiate(mazeParts[5], location, Quaternion.identity) as GameObject;
+                        mazePiece.name = "[" + x + ", " + y + "]";
+                        mazePiece.transform.SetParent(transform);
                         break;
                     default:
                         break;
                 }
-                z += 6.0f;
+
+                xCoord += 6.0f;
             }
-            x += 6.0f;
-            z = 0.0f;
+            zCoord += 6.0f;
+            xCoord = 0.0f;
         }
     }
 
@@ -163,5 +192,5 @@ public class MazeGeneratorController : MonoBehaviour
 
 public class MazeCell
 {
-    public int doorUp = 0, doorRight = 0;
+    public int doorUp = 0, doorRight = 0, doorLeft = 0, doorDown = 0;
 }
